@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "mongodb": "^6.20.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5"
+  }
+}
