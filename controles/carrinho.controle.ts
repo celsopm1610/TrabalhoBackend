@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
-import { db } from "../database/banco-mongo"; // ajuste o caminho conforme teu projeto
+import { db } from "../database/banco-mongo";
 
 interface AlbumDocument {
   id: ObjectId;
