@@ -2,11 +2,12 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { db } from "../database/banco-mongo.js";
+import { ObjectId } from "mongodb";
 
 const JWT_SECRET = "segredo_super_seguro"; // Ideal guardar em variável de ambiente (.env)
 
 interface Usuario {
-  _id?: string;
+  _id?: ObjectId;
   nome: string;
   email: string;
   senha: string;

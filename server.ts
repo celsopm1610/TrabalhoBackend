@@ -3,36 +3,37 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { conectarBanco } from "./database/banco-mongo.js";
 
-// Importar rotas
-import authRotas from "./rotas/auth.rotas.js";
-import produtoRotas from "./rotas/produto.rotas.js";
-import carrinhoRotas from "./rotas/carrinho.rotas.js";
-import admRotas from "./rotas/adm.rotas.js";
+// Importação dos controllers/rotas
+import Auth from "./Middlewares/auth.ts";
+import produtoRoutes from "./Rotas/produto.rotas.ts";
+import carrinhoRoutes from "./Rotas/carrinho.rota.ts";
+import authRoutes from "./rotas/auto.rotas.ts";
+import adminRoutes from "./rotas/adm.rotas.ts";
 
-dotenv.config(); // Carrega variáveis de ambiente (.env)
+dotenv.config();
 
 const app = express();
-
-// Configurações básicas
 app.use(cors());
 app.use(express.json());
 
-// Conexão com o banco
-conectarBanco()
-  .then(() => console.log("✅ Conectado ao MongoDB com sucesso!"))
-  .catch((err) => console.error("❌ Erro ao conectar no banco:", err));
-
-// Registrar rotas
-app.use(authRotas);
-app.use(produtoRotas);
-app.use(carrinhoRotas);
-app.use(admRotas);
-
-// Rota base
-app.get("/", (req, res) => {
-  res.send("🎵 API da Loja de Álbuns está online!");
+// Conectar ao banco MongoDB Atlas
+conectarBanco().then(() => {
+  console.log("🎵 Conectado ao MongoDB Atlas com sucesso!");
 });
 
-// Porta
+// 🚀 Rota pública (sem login)
+app.use("/api/auth", authRoutes); 
+app.use("/api/produtos", produtoRoutes); // visitante pode ver produtos
+
+// 🧱 Middleware de autenticação (a partir daqui tudo é protegido)
+app.use("/api/carrinho", Auth, carrinhoRoutes);
+app.use("/api/admin", Auth, adminRoutes);
+
+//  Rota de teste
+app.get("/", (req, res) => {
+  res.send("🚀 API da Loja de Álbuns está rodando!");
+});
+
+// Iniciar servidor
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🔥 Servidor rodando em http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
