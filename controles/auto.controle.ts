@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { db } from "../database/banco-mongo.js";
 import { ObjectId } from "mongodb";
 
-const JWT_SECRET = "segredo_super_seguro"; // Ideal guardar em variável de ambiente (.env)
+const JWT_SECRET = "segredo_super_seguro"; 
 
 interface Usuario {
   _id?: ObjectId;

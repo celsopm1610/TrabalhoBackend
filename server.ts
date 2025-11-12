@@ -16,22 +16,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Conectar ao banco MongoDB Atlas
+// Conectar no MongoDB 
 conectarBanco().then(() => {
-  console.log("🎵 Conectado ao MongoDB Atlas com sucesso!");
+  console.log("Conectado ao MongoDB Atlas com sucesso!");
 });
 
-// 🚀 Rota pública (sem login)
+// Rota pública 
 app.use("/api/auth", authRoutes); 
-app.use("/api/produtos", produtoRoutes); // visitante pode ver produtos
+app.use("/api/produtos", produtoRoutes);
 
-// 🧱 Middleware de autenticação (a partir daqui tudo é protegido)
+// Middleware de autenticação 
 app.use("/api/carrinho", Auth, carrinhoRoutes);
 app.use("/api/admin", Auth, adminRoutes);
 
 //  Rota de teste
 app.get("/", (req, res) => {
-  res.send("🚀 API da Loja de Álbuns está rodando!");
+  res.send("API do Brazino Records está rodando!");
 });
 
 // Iniciar servidor

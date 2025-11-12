@@ -4,14 +4,13 @@ import jwt from "jsonwebtoken";
 
 dotenv.config();
 
-// Interface compatível com seu carrinho.controller.ts
 interface AutenticacaoRequest extends Request {
   usuarioId?: string;
-  tipo?: string; // para saber se é admin ou usuário comum
+  tipo?: string; 
 }
 
 function Auth(req: AutenticacaoRequest, res: Response, next: NextFunction) {
-  console.log("🧱 Passando pelo middleware de autenticação...");
+  console.log("Passando pelo middleware de autenticação...");
 
   const authHeader = req.headers.authorization;
 
@@ -28,12 +27,11 @@ function Auth(req: AutenticacaoRequest, res: Response, next: NextFunction) {
       tipo: string;
     };
 
-    // Adiciona informações úteis na requisição
     req.usuarioId = decoded.usuarioId;
     req.tipo = decoded.tipo;
 
-    console.log("✅ Token válido para usuário:", decoded.usuarioId);
-    next(); // segue para o próximo passo
+    console.log("Token válido para usuário:", decoded.usuarioId);
+    next(); 
   } catch (erro) {
     console.error("❌ Erro ao verificar token:", erro);
     return res.status(401).json({ mensagem: "Token inválido ou expirado" });
