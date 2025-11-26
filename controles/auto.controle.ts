@@ -4,7 +4,8 @@ import bcrypt from "bcryptjs";
 import { db } from "../database/banco-mongo.js";
 import { ObjectId } from "mongodb";
 
-const JWT_SECRET = "segredo_super_seguro"; 
+// Use a secret from env when disponível, mantendo um fallback para desenvolvimento
+const JWT_SECRET = process.env.JWT_SECRET || "Musica";
 
 interface Usuario {
   _id?: ObjectId;
@@ -68,10 +69,11 @@ class AuthController {
         return res.status(401).json({ mensagem: "Senha incorreta." });
       }
 
-      // Gera o token JWT
+      // Gera o token JWT. OBS: usamos a chave 'usuarioId' para ser compatível com o
+      // middleware de autenticação (`Middlewares/auth.ts`) que espera esse campo.
       const token = jwt.sign(
         {
-          id: usuario._id,
+          usuarioId: usuario._id?.toString(),
           nome: usuario.nome,
           tipo: usuario.tipo
         },

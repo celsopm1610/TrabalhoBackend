@@ -51,8 +51,10 @@ class CarrinhoController {
       if (!quantidade || quantidade <= 0)
         return res.status(400).json({ mensagem: "quantidade inválida" });
 
+      if (!ObjectId.isValid(albumId)) return res.status(400).json({ mensagem: "albumId inválido" });
       const albumObjectId = new ObjectId(albumId);
-      const album = await db.collection<AlbumDocument>("albuns").findOne({ _id: albumObjectId });
+      // Os produtos/álbuns estão na coleção 'produtos'
+      const album = await db.collection<AlbumDocument>("produtos").findOne({ _id: albumObjectId });
 
       if (!album)
         return res.status(404).json({ mensagem: "Álbum não encontrado" });
@@ -71,8 +73,9 @@ class CarrinhoController {
           dataAtualizacao: new Date(),
           total: precoUnitario * quantidade,
         };
-        await db.collection("carrinhos").insertOne(novoCarrinho);
-        return res.status(201).json(novoCarrinho);
+        const resultado = await db.collection("carrinhos").insertOne(novoCarrinho);
+        const novoCarrinhoRetorno = { ...novoCarrinho, _id: resultado.insertedId.toString() };
+        return res.status(201).json(novoCarrinhoRetorno);
       }
 
       const itemExistente = carrinho.itens.find(
@@ -91,12 +94,12 @@ class CarrinhoController {
       );
       carrinho.dataAtualizacao = new Date();
 
-      await db.collection("carrinhos").updateOne(
-        { usuarioId },
-        { $set: carrinho }
-      );
+      await db.collection("carrinhos").updateOne({ usuarioId }, { $set: carrinho });
 
-      return res.status(200).json(carrinho);
+      // Normaliza _id se existir (pode ser ObjectId)
+      const carrinhoRetorno = { ...carrinho } as any;
+      if ((carrinho as any)._id) carrinhoRetorno._id = (carrinho as any)._id.toString();
+      return res.status(200).json(carrinhoRetorno);
     } catch (error) {
       console.error(error);
       return res.status(500).json({ mensagem: "Erro ao adicionar item" });
@@ -126,11 +129,17 @@ class CarrinhoController {
   }
 
   async listar(req: Request, res: Response) {
-    const { usuarioId } = req.params;
+    // Mantemos compatibilidade com rota antiga que recebe :usuarioId
+    const usuarioIdParam = (req.params as any).usuarioId as string | undefined;
+    const usuarioId = usuarioIdParam || (req as AutenticacaoRequest).usuarioId;
+    if (!usuarioId) return res.status(400).json({ mensagem: "usuarioId não fornecido" });
+
     const carrinho = await db.collection<Carrinho>("carrinhos").findOne({ usuarioId });
-    if (!carrinho)
-      return res.status(404).json({ mensagem: "Carrinho não encontrado" });
-    return res.status(200).json(carrinho);
+    if (!carrinho) return res.status(404).json({ mensagem: "Carrinho não encontrado" });
+
+    const carrinhoRetorno = { ...carrinho } as any;
+    if ((carrinho as any)._id) carrinhoRetorno._id = (carrinho as any)._id.toString();
+    return res.status(200).json(carrinhoRetorno);
   }
 
   async remover(req: Request, res: Response) {

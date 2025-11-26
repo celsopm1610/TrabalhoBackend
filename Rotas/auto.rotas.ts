@@ -3,8 +3,8 @@ import AuthController from "../controles/auto.controle.ts";
 
 const router = express.Router();
 
-router.post("/auth/registro", AuthController.registrar);
-router.post("/auth/login", AuthController.login);
-router.post("/auth/validar", AuthController.validarToken);
+router.post("/registro", AuthController.registrar); //
+router.post("/login", AuthController.login);        //
+router.post("/validar", AuthController.validarToken); //
 
 export default router;

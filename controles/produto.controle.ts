@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ObjectId } from "bson";
+import { ObjectId } from "mongodb";
 import { db } from "../database/banco-mongo.js";
 
 interface Produto {
@@ -33,8 +33,9 @@ class ProdutoController {
         dataCadastro: new Date()
       };
 
-      await db.collection("produtos").insertOne(novoProduto);
-      return res.status(201).json({ mensagem: "Produto cadastrado com sucesso!", novoProduto });
+      const resultado = await db.collection("produtos").insertOne(novoProduto);
+      const novoProdutoComId = { ...novoProduto, _id: resultado.insertedId.toString() };
+      return res.status(201).json({ mensagem: "Produto cadastrado com sucesso!", novoProduto: novoProdutoComId });
     } catch (erro) {
       console.error("Erro ao criar produto:", erro);
       return res.status(500).json({ mensagem: "Erro interno ao criar produto." });
@@ -45,7 +46,8 @@ class ProdutoController {
   async listar(req: Request, res: Response) {
     try {
       const produtos = await db.collection<Produto>("produtos").find().toArray();
-      return res.status(200).json(produtos);
+      const produtosNormalizados = produtos.map(p => ({ ...p, _id: p._id ? p._id.toString() : p._id }));
+      return res.status(200).json(produtosNormalizados);
     } catch (erro) {
       console.error("Erro ao listar produtos:", erro);
       return res.status(500).json({ mensagem: "Erro ao listar produtos." });
@@ -56,13 +58,12 @@ class ProdutoController {
   async buscarPorId(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      if (!ObjectId.isValid(id)) return res.status(400).json({ mensagem: "ID de produto inválido." });
       const produto = await db.collection<Produto>("produtos").findOne({ _id: new ObjectId(id) });
 
-      if (!produto) {
-        return res.status(404).json({ mensagem: "Produto não encontrado." });
-      }
+      if (!produto) return res.status(404).json({ mensagem: "Produto não encontrado." });
 
-      return res.status(200).json(produto);
+      return res.status(200).json({ ...produto, _id: produto._id ? produto._id.toString() : produto._id });
     } catch (erro) {
       console.error("Erro ao buscar produto:", erro);
       return res.status(500).json({ mensagem: "Erro ao buscar produto." });
@@ -75,15 +76,11 @@ class ProdutoController {
       const { id } = req.params;
       const { nome, artista, preco, capa, estoque, categoria } = req.body;
 
+      if (!ObjectId.isValid(id)) return res.status(400).json({ mensagem: "ID de produto inválido." });
       const produto = await db.collection<Produto>("produtos").findOne({ _id: new ObjectId(id) });
-      if (!produto) {
-        return res.status(404).json({ mensagem: "Produto não encontrado." });
-      }
+      if (!produto) return res.status(404).json({ mensagem: "Produto não encontrado." });
 
-      await db.collection("produtos").updateOne(
-        { _id: new ObjectId(id) },
-        { $set: { nome, artista, preco, capa, estoque, categoria } }
-      );
+      await db.collection("produtos").updateOne({ _id: new ObjectId(id) }, { $set: { nome, artista, preco, capa, estoque, categoria } });
 
       return res.status(200).json({ mensagem: "Produto atualizado com sucesso!" });
     } catch (erro) {
@@ -97,6 +94,7 @@ class ProdutoController {
     try {
       const { id } = req.params;
 
+      if (!ObjectId.isValid(id)) return res.status(400).json({ mensagem: "ID de produto inválido." });
       const resultado = await db.collection("produtos").deleteOne({ _id: new ObjectId(id) });
 
       if (resultado.deletedCount === 0) {

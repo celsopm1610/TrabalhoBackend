@@ -4,13 +4,13 @@ import auth from "../Middlewares/auth.ts";
 
 const router = express.Router();
 
-
-router.post("/carrinho/adicionar", auth, CarrinhoController.adicionarItem);
-
-router.delete("/carrinho/remover", auth, CarrinhoController.removerItem);
-
-router.get("/carrinho/:usuarioId", auth, CarrinhoController.listar);
-
-router.delete("/carrinho/remover/:usuarioId", auth, CarrinhoController.remover);
+// Rotas de carrinho (o middleware de autenticação é aplicado em server.ts)
+router.post("/adicionar", CarrinhoController.adicionarItem);
+router.delete("/remover", CarrinhoController.removerItem);
+// Nova rota: GET /api/carrinho -> usa usuarioId extraído do token
+router.get("/", CarrinhoController.listar);
+// Mantemos compatibilidade com rota antiga que recebe :usuarioId
+router.get("/:usuarioId", CarrinhoController.listar);
+router.delete("/remover/:usuarioId", CarrinhoController.remover);
 
 export default router;
