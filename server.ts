@@ -4,11 +4,11 @@ import dotenv from "dotenv";
 import { conectarBanco } from "./database/banco-mongo.js";
 
 // Importação dos controllers/rotas
-import Auth from "./Middlewares/auth.ts";
-import produtoRoutes from "./rotas/produto.rotas.ts";
-import carrinhoRoutes from "./Rotas/carrinho.rota.ts";
-import authRoutes from "./rotas/auto.rotas.ts";
-import adminRoutes from "./rotas/adm.rotas.ts";
+import Auth from "./Middlewares/auth.js";
+import produtoRoutes from "./rotas/produto.rotas.js";
+import carrinhoRoutes from "./rotas/carrinho.rota.js";
+import authRoutes from "./rotas/auto.rotas.js";
+import adminRoutes from "./rotas/adm.rotas.js";
 
 dotenv.config();
 
