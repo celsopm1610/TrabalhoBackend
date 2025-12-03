@@ -18,6 +18,7 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "tsx watch server.ts"
+     "build": "npm install && tsc",
+     "dev": "tsx watch server.ts"
   }
 }
