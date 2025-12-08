@@ -22,6 +22,7 @@
   "type": "module",
   "scripts": {
     "build": "npm install && tsc",
-    "dev": "tsx watch server.ts"
+    "dev": "tsx watch server.ts",
+    "start": "node dist/server.js"
   }
 }
