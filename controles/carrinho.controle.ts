@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
-import { db } from "../database/banco-mongo";
+import { db } from "../database/banco-mongo.js"; 
 
 interface AlbumDocument {
   id: ObjectId;
@@ -51,9 +51,10 @@ class CarrinhoController {
       if (!quantidade || quantidade <= 0)
         return res.status(400).json({ mensagem: "quantidade inválida" });
 
+      // Verificação corrigida
       if (!ObjectId.isValid(albumId)) return res.status(400).json({ mensagem: "albumId inválido" });
+      
       const albumObjectId = new ObjectId(albumId);
-      // Os produtos/álbuns estão na coleção 'produtos'
       const album = await db.collection<AlbumDocument>("produtos").findOne({ _id: albumObjectId });
 
       if (!album)
@@ -96,7 +97,6 @@ class CarrinhoController {
 
       await db.collection("carrinhos").updateOne({ usuarioId }, { $set: carrinho });
 
-      // Normaliza _id se existir (pode ser ObjectId)
       const carrinhoRetorno = { ...carrinho } as any;
       if ((carrinho as any)._id) carrinhoRetorno._id = (carrinho as any)._id.toString();
       return res.status(200).json(carrinhoRetorno);
@@ -129,7 +129,6 @@ class CarrinhoController {
   }
 
   async listar(req: Request, res: Response) {
-    // Mantemos compatibilidade com rota antiga que recebe :usuarioId
     const usuarioIdParam = (req.params as any).usuarioId as string | undefined;
     const usuarioId = usuarioIdParam || (req as AutenticacaoRequest).usuarioId;
     if (!usuarioId) return res.status(400).json({ mensagem: "usuarioId não fornecido" });

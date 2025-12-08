@@ -14,7 +14,6 @@ interface Produto {
 }
 
 class ProdutoController {
-  // Criar novo produto
   async criar(req: Request, res: Response) {
     try {
       const { nome, artista, preco, capa, estoque, categoria } = req.body;
@@ -42,7 +41,6 @@ class ProdutoController {
     }
   }
 
-  // Listar todos os produtos
   async listar(req: Request, res: Response) {
     try {
       const produtos = await db.collection<Produto>("produtos").find().toArray();
@@ -54,11 +52,12 @@ class ProdutoController {
     }
   }
 
-  // Buscar um produto pelo ID
   async buscarPorId(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      if (!ObjectId.isValid(id)) return res.status(400).json({ mensagem: "ID de produto inválido." });
+      // Correção aqui
+      if (!id || !ObjectId.isValid(id)) return res.status(400).json({ mensagem: "ID de produto inválido." });
+      
       const produto = await db.collection<Produto>("produtos").findOne({ _id: new ObjectId(id) });
 
       if (!produto) return res.status(404).json({ mensagem: "Produto não encontrado." });
@@ -70,13 +69,14 @@ class ProdutoController {
     }
   }
 
-  // Atualizar produto
   async atualizar(req: Request, res: Response) {
     try {
       const { id } = req.params;
       const { nome, artista, preco, capa, estoque, categoria } = req.body;
 
-      if (!ObjectId.isValid(id)) return res.status(400).json({ mensagem: "ID de produto inválido." });
+      // Correção aqui
+      if (!id || !ObjectId.isValid(id)) return res.status(400).json({ mensagem: "ID de produto inválido." });
+
       const produto = await db.collection<Produto>("produtos").findOne({ _id: new ObjectId(id) });
       if (!produto) return res.status(404).json({ mensagem: "Produto não encontrado." });
 
@@ -89,12 +89,13 @@ class ProdutoController {
     }
   }
 
-  // Remover produto
   async remover(req: Request, res: Response) {
     try {
       const { id } = req.params;
 
-      if (!ObjectId.isValid(id)) return res.status(400).json({ mensagem: "ID de produto inválido." });
+      // Correção aqui
+      if (!id || !ObjectId.isValid(id)) return res.status(400).json({ mensagem: "ID de produto inválido." });
+      
       const resultado = await db.collection("produtos").deleteOne({ _id: new ObjectId(id) });
 
       if (resultado.deletedCount === 0) {

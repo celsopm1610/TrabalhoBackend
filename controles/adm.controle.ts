@@ -12,7 +12,6 @@ interface Album {
 }
 
 class AdmController {
-  // Criar novo álbum
   async criarAlbum(req: Request, res: Response) {
     try {
       const { nome, artista, preco, capa } = req.body;
@@ -38,7 +37,6 @@ class AdmController {
     }
   }
 
-  // Listar todos os álbuns
   async listarAlbuns(req: Request, res: Response) {
     try {
       const albuns = await db.collection<Album>("albuns").find().toArray();
@@ -50,13 +48,13 @@ class AdmController {
     }
   }
 
-  // Atualizar um álbum
   async atualizarAlbum(req: Request, res: Response) {
     try {
       const { id } = req.params;
       const { nome, artista, preco, capa } = req.body;
 
-      if (!ObjectId.isValid(id)) {
+      // Correção aqui: Verifica se ID existe antes de validar
+      if (!id || !ObjectId.isValid(id)) {
         return res.status(400).json({ mensagem: "ID de álbum inválido." });
       }
 
@@ -74,12 +72,12 @@ class AdmController {
     }
   }
 
-  // Remover um álbum
   async removerAlbum(req: Request, res: Response) {
     try {
       const { id } = req.params;
 
-      if (!ObjectId.isValid(id)) {
+      // Correção aqui: Verifica se ID existe antes de validar
+      if (!id || !ObjectId.isValid(id)) {
         return res.status(400).json({ mensagem: "ID de álbum inválido." });
       }
 
