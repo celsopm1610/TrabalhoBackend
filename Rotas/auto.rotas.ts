@@ -1,5 +1,5 @@
 import express from "express";
-import AuthController from "../Controles/auto.controle.js"; 
+import AuthController from "../controles/auto.controle.js"; 
 const router = express.Router();
 
 router.post("/registro", AuthController.registrar);

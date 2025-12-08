@@ -1,5 +1,5 @@
 import express from "express";
-import AdmController from "../Controles/adm.controle.js"; 
+import AdmController from "../controles/adm.controle.js"; 
 
 const router = express.Router();
 
